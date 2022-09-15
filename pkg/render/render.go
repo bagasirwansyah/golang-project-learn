@@ -3,6 +3,7 @@ package render
 import (
 	"bytes"
 	"go-learn-web/pkg/config"
+	"go-learn-web/pkg/models"
 	"html/template"
 	"log"
 	"net/http"
@@ -16,8 +17,12 @@ func NewTemplates(a *config.AppConfig) {
 	app = a
 }
 
+func AddDefaultData(td *models.TemplateData) *models.TemplateData {
+	return td
+}
+
 // RenderTemplate renders templates using html/template
-func RenderTemplate(w http.ResponseWriter, tmpl string) {
+func RenderTemplate(w http.ResponseWriter, tmpl string, td *models.TemplateData) {
 	var tc map[string]*template.Template
 	if app.UseCache {
 		// get the template cache from the app config
@@ -33,7 +38,9 @@ func RenderTemplate(w http.ResponseWriter, tmpl string) {
 
 	buf := new(bytes.Buffer)
 
-	err := t.Execute(buf, nil)
+	td = AddDefaultData(td)
+
+	err := t.Execute(buf, td)
 	if err != nil {
 		log.Println(err)
 	}
